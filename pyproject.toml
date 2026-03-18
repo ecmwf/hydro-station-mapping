@@ -1,0 +1,116 @@
+[build-system]
+requires = ["setuptools>=77", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hydro-station-mapping"
+requires-python = ">=3.10"
+authors = [
+    {name = "European Centre for Medium-Range Weather Forecasts (ECMWF)", email = "software.support@ecmwf.int"},
+]
+maintainers = [
+    {name = "Oisín M. Morrison", email = "oisin.morrison@ecmwf.int"},
+    {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"}
+]
+description = "A tool for hydrological station mapping"
+license = "Apache-2.0"
+license-files = [ "LICENSE" ]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering"
+    ]
+dynamic = ["version", "readme"]
+
+dependencies = [
+    "numpy",
+    "pandas",
+    "xarray",
+    "matplotlib",
+    "geopandas",
+    "typer", # check if necessary
+    "humanize", # check if necessary
+    "tqdm",
+    "ipyleaflet",
+    "ipywidgets",
+    "earthkit-data>=0.18.2",
+    "earthkit-hydro>=1.2.0",
+    "earthkit-meteo",
+    "cfgrib", # check if necessary
+    "netCDF4", # check if necessary
+    "eccodes", # check if necessary
+    "plotly",
+    "floods-html",
+    "geopy",
+    "setuptools",
+    "anywidget"
+]
+
+[project.urls]
+    repository = "https://github.com/ecmwf/hydro-station-mapping"
+    documentation = "https://github.com/ecmwf/hydro-station-mapping"
+    issues = "https://github.com/ecmwf/hydro-station-mapping/issues"
+
+[project.optional-dependencies]
+    test = [
+        "pytest",
+        "pytest-cov"
+    ]
+    dev = [
+        "pytest",
+        "pytest-cov",
+        "ruff",
+        "pre-commit"
+    ]
+
+[project.scripts]
+hydro-station-mapping = "hydro_station_mapping.cli:mapper_cli"
+
+# Linting settings
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = [
+    "F401", # unused imports
+    ]
+
+# Testing
+[tool.pytest.ini_options]
+addopts = "--pdbcls=IPython.terminal.debugger:Pdb"
+testpaths = [
+    "tests",
+]
+
+# Packaging/setuptools options
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"], content-type = "text/markdown"}
+
+[tool.setuptools.packages.find]
+include = [ "hydro_station_mapping" ]
+where = [ "src/" ]
+
+
+[tool.setuptools_scm]
+version_file = "src/hydro_station_mapping/_version.py"
+version_file_template = '''
+# Do not change! Do not track in version control!
+__version__ = "{version}"
+'''
+local_scheme = "no-local-version"
