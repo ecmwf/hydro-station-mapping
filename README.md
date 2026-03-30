@@ -28,11 +28,16 @@
 
 ## Quick Start
 
+Either use the commandline utility:
+```bash
+hydro-station-mapping config.yml
+```
+
+or the Python interface directly:
 ```python
+from hydro_station_mapping import mapper
 
-    from hydro_station_mapping import mapper
-
-    mapped_df = mapper(config)
+mapped_df = mapper(config)
 ```
 
 ## Installation
