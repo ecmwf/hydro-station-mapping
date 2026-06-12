@@ -14,10 +14,10 @@ def get_grid_inputs(grid_config):
     metric_grid = ds[nc_variable].values
 
     coord_dict = grid_config.get("coords", None)
-    coord_x = "lat" if coord_dict is None else coord_dict["x"]
-    coord_y = "lon" if coord_dict is None else coord_dict["y"]
+    coord_y = "lat" if coord_dict is None else coord_dict["y"]
+    coord_x = "lon" if coord_dict is None else coord_dict["x"]
 
-    grid_area_coords1, grid_area_coords2 = xr.broadcast(ds[coord_x], ds[coord_y])
+    grid_area_coords1, grid_area_coords2 = xr.broadcast(ds[coord_y], ds[coord_x])
     grid_area_coords1 = grid_area_coords1.values.copy()
     grid_area_coords2 = grid_area_coords2.values.copy()
 
@@ -29,10 +29,10 @@ def get_station_inputs(station_config):
     filters = station_config.get("filter")
     if filters is not None:
         df = df.query(filters)
-    coord_x = station_config["coords"]["x"]
     coord_y = station_config["coords"]["y"]
-    station_coords1 = df[coord_x].values
-    station_coords2 = df[coord_y].values
+    coord_x = station_config["coords"]["x"]
+    station_coords1 = df[coord_y].values
+    station_coords2 = df[coord_x].values
     station_metric = df[station_config["metric"]].values
     return station_metric, station_coords1, station_coords2, df
 
@@ -48,18 +48,18 @@ def apply_blacklist(blacklist_config, metric_grid, grid_area_coords1, grid_area_
 
 
 def outputs_to_df(
-    df, indx, indy, area, cindx, cindy, carae, errors, grid_area_coords1, grid_area_coords2, shape, filename
+    df, i, j, area, c_i, c_j, c_area, errors, grid_area_coords1, grid_area_coords2, shape, filename
 ):
-    df["opt_x_index"] = indx
-    df["opt_y_index"] = indy
-    df["near_x_index"] = cindx
-    df["near_y_index"] = cindy
-    df["near_area"] = carae
+    df["opt_i"] = i
+    df["opt_j"] = j
+    df["near_i"] = c_i
+    df["near_j"] = c_j
+    df["near_area"] = c_area
     df["opt_error"] = errors
     df["opt_area"] = area
-    df["opt_x_coord"] = grid_area_coords1[indx, 0]
-    df["opt_y_coord"] = grid_area_coords2[0, indy]
-    df["opt_1d_index"] = indy + shape[1] * indx
+    df["opt_x_coord"] = grid_area_coords1[i, 0]
+    df["opt_y_coord"] = grid_area_coords2[0, j]
+    df["opt_1d_index"] = j + shape[1] * i
     if filename is not None:
         df.to_csv(filename, index=False)
     return df
@@ -79,13 +79,13 @@ def generate_summary_plots(df, plot_config):
 
     distance_plot_config = plot_config.get("error", None)
     if distance_plot_config is not None:
-        df["grid_offset_x"] = df["opt_x_index"] - df["near_x_index"]
-        df["grid_offset_y"] = df["opt_y_index"] - df["near_y_index"]
+        df["grid_offset_i"] = df["opt_i"] - df["near_i"]
+        df["grid_offset_j"] = df["opt_j"] - df["near_j"]
         custom_scale = light_zero_color("Viridis")
         fig = px.density_heatmap(
             df,
-            x="grid_offset_x",
-            y="grid_offset_y",
+            x="grid_offset_i",
+            y="grid_offset_j",
             marginal_x="histogram",
             marginal_y="histogram",
             color_continuous_scale=custom_scale,
@@ -101,8 +101,11 @@ def generate_summary_plots(df, plot_config):
 
 
 def mapper(config):
+
     metric_grid, grid_area_coords1, grid_area_coords2 = get_grid_inputs(config["grid"])
+
     station_metric, station_coords1, station_coords2, df = get_station_inputs(config["station"])
+
     metric_grid, grid_area_coords1, grid_area_coords2 = apply_blacklist(
         config.get("blacklist", None), metric_grid, grid_area_coords1, grid_area_coords2
     )
@@ -117,5 +120,7 @@ def mapper(config):
         shape=grid_area_coords1.shape,
         filename=config["output"]["file"] if config.get("output", None) is not None else None,
     )
+
     generate_summary_plots(df, config.get("plot", None))
+    
     return df

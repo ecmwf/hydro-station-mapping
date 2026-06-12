@@ -23,16 +23,16 @@ class StationMapping:
     ):
         num_stations = len(station_coords1)
 
-        indxs = np.empty(num_stations, dtype=int)
-        indys = np.empty(num_stations, dtype=int)
-        closest_indxs = np.empty(num_stations, dtype=int)
-        closest_indys = np.empty(num_stations, dtype=int)
+        i = np.empty(num_stations, dtype=int)
+        j = np.empty(num_stations, dtype=int)
+        c_i = np.empty(num_stations, dtype=int)
+        c_j = np.empty(num_stations, dtype=int)
         errors = np.empty(num_stations, dtype=float)
-        closest_areas = np.empty(num_stations, dtype=float)
+        c_area = np.empty(num_stations, dtype=float)
         best_areas = np.empty(num_stations, dtype=float)
 
-        for i in range(num_stations):
-            station_x, station_y = station_coords1[i], station_coords2[i]
+        for s in range(num_stations):
+            station_x, station_y = station_coords1[s], station_coords2[s]
 
             # get all grid cells within max_search_distance
             closest_idx = np.nanargmin(np.abs(grid_area_coords1[:, 0] - station_x))
@@ -42,7 +42,6 @@ class StationMapping:
             searchbox_max_x = closest_idx + self.max_search_distance + 1
             searchbox_min_y = closest_idy - self.max_search_distance
             searchbox_max_y = closest_idy + self.max_search_distance + 1
-
             # TODO: add option to wrap domain
             searchbox_min_x = max(0, searchbox_min_x)
             searchbox_max_x = min(grid_area_coords1.shape[0], searchbox_max_x)
@@ -67,7 +66,7 @@ class StationMapping:
             else:
                 assert grid_metric is not None
                 subset_metric = grid_metric[searchbox_min_x:searchbox_max_x, searchbox_min_y:searchbox_max_y].flatten()
-                area_error = self.metric_error_func(station_metric[i], subset_metric)
+                area_error = self.metric_error_func(station_metric[s], subset_metric)
 
             error = area_error + self.lambd * distance_error
             area = subset_metric
@@ -112,14 +111,14 @@ class StationMapping:
                 best_error = closest_error
                 best_area = closest_area
 
-            indxs[i] = indx
-            indys[i] = indy
+            i[s] = indx
+            j[s] = indy
 
-            closest_indxs[i] = closest_idx
-            closest_indys[i] = closest_idy
+            c_i[s] = closest_idx
+            c_j[s] = closest_idy
 
-            errors[i] = best_error
-            best_areas[i] = best_area
-            closest_areas[i] = closest_area
+            errors[s] = best_error
+            best_areas[s] = best_area
+            c_area[s] = closest_area
 
-        return indxs, indys, best_areas, closest_indxs, closest_indys, closest_areas, errors
+        return i, j, best_areas, c_i, c_j, c_area, errors
