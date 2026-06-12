@@ -6,16 +6,16 @@ config = {
         "file": "stations.csv",
         "filter": "(StationLon >= 0) and (drainage_area_provided >= 0)",
         "coords": {
+            "x": "StationLon",
             "y": "StationLat",
-            "x": "StationLon"
         },
         "metric": "drainage_area_provided"
     },
     "grid": {
         "source": ["file", "upstream_area.nc"],
         "coords": {
+            "x": "lon",
             "y": "lat",
-            "x": "lon"
         }
     },
     # "blacklist": {
@@ -92,8 +92,8 @@ def test_mapping():
         "near_area": [160.0, 280.0, 400.0],
         "opt_error": [0.200000, 0.066667, 0.040000],
         "opt_area": [40.0, 140.0, 240.0],
-        "opt_x_coord": [0, 10, 20],
-        "opt_y_coord": [90, 90, 90],
+        "opt_y_coord": [0, 10, 20],
+        "opt_x_coord": [90, 90, 90],
         "opt_1d_index": [0, 4, 8]
     })
     pd.testing.assert_frame_equal(df, expected_df)
