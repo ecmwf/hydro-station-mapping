@@ -6,16 +6,16 @@ config = {
         "file": "stations.csv",
         "filter": "(StationLon >= 0) and (drainage_area_provided >= 0)",
         "coords": {
-            "x": "StationLat",
-            "y": "StationLon"
+            "x": "StationLon",
+            "y": "StationLat",
         },
         "metric": "drainage_area_provided"
     },
     "grid": {
         "source": ["file", "upstream_area.nc"],
         "coords": {
-            "x": "lat",
-            "y": "lon"
+            "x": "lon",
+            "y": "lat",
         }
     },
     # "blacklist": {
@@ -85,15 +85,15 @@ def test_mapping():
         "StationLat": [10, 20, 30],
         "StationLon": [100, 110, 120],
         "drainage_area_provided": [50, 150, 250],
-        "opt_x_index": [0, 1, 2],
-        "opt_y_index": [0, 0, 0],
-        "near_x_index": [1, 2, 3],
-        "near_y_index": [1, 2, 3],
+        "opt_i": [0, 1, 2],
+        "opt_j": [0, 0, 0],
+        "near_i": [1, 2, 3],
+        "near_j": [1, 2, 3],
         "near_area": [160.0, 280.0, 400.0],
         "opt_error": [0.200000, 0.066667, 0.040000],
         "opt_area": [40.0, 140.0, 240.0],
-        "opt_x_coord": [0, 10, 20],
-        "opt_y_coord": [90, 90, 90],
+        "opt_y_coord": [0, 10, 20],
+        "opt_x_coord": [90, 90, 90],
         "opt_1d_index": [0, 4, 8]
     })
     pd.testing.assert_frame_equal(df, expected_df)
