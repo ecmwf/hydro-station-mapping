@@ -29,6 +29,8 @@ class StationMapping:
         c_areas = np.empty(num_stations, dtype=float)
         best_areas = np.empty(num_stations, dtype=float)
 
+        grid_shape = grid_area_y_coords.shape
+
         for s in range(num_stations):
             station_y, station_x = station_y_coords[s], station_x_coords[s]
 
@@ -42,9 +44,9 @@ class StationMapping:
             searchbox_max_j = closest_j + self.max_search_distance + 1
             # TODO: add option to wrap domain
             searchbox_min_i = max(0, searchbox_min_i)
-            searchbox_max_i = min(grid_area_y_coords.shape[0], searchbox_max_i)
+            searchbox_max_i = min(grid_shape[0], searchbox_max_i)
             searchbox_min_j = max(0, searchbox_min_j)
-            searchbox_max_j = min(grid_area_y_coords.shape[1], searchbox_max_j)
+            searchbox_max_j = min(grid_shape[1], searchbox_max_j)
 
             subset_y = grid_area_y_coords[searchbox_min_i:searchbox_max_i, searchbox_min_j:searchbox_max_j]
             subset_x = grid_area_x_coords[searchbox_min_i:searchbox_max_i, searchbox_min_j:searchbox_max_j]
@@ -89,8 +91,8 @@ class StationMapping:
                     best_error = closest_error
                     best_area = closest_area
                 elif best_error <= self.max_error:
-                    i = (min_index[0] + searchbox_min_i) % grid_area_y_coords.shape[0]
-                    j = (min_index[1] + searchbox_min_j) % grid_area_y_coords.shape[1]
+                    i = (min_index[0] + searchbox_min_i) % grid_shape[0]
+                    j = (min_index[1] + searchbox_min_j) % grid_shape[1]
                 else:  # if best match is still too bad, revert to closest cell
                     i = closest_i
                     j = closest_j
