@@ -1,4 +1,5 @@
 import pandas as pd
+from .config import Config
 import xarray as xr
 import earthkit.data as ekd
 import numpy as np
@@ -9,13 +10,13 @@ from .station_mapping import StationMapping
 
 
 def get_grid_inputs(grid_config):
-    ds = ekd.from_source(*grid_config["source"]).to_xarray()
+    ds = ekd.from_source(*grid_config.source).to_xarray()
     nc_variable = find_main_var(ds, 2)
     metric_grid = ds[nc_variable].values
 
-    coord_dict = grid_config.get("coords")
-    coord_x = "lon" if coord_dict is None else coord_dict["x"]
-    coord_y = "lat" if coord_dict is None else coord_dict["y"]
+    coord_dict = grid_config.coords
+    coord_x = coord_dict.x
+    coord_y = coord_dict.y
 
     grid_area_y_coords, grid_area_x_coords = xr.broadcast(ds[coord_y], ds[coord_x])
     grid_area_y_coords = grid_area_y_coords.values.copy()
@@ -25,22 +26,22 @@ def get_grid_inputs(grid_config):
 
 
 def get_station_inputs(station_config):
-    df = pd.read_csv(station_config["file"])
-    filters = station_config.get("filter")
+    df = pd.read_csv(station_config.file)
+    filters = station_config.filter
     if filters is not None:
         df = df.query(filters)
-    coord_x = station_config["coords"]["x"]
-    coord_y = station_config["coords"]["y"]
+    coord_x = station_config.coords.x
+    coord_y = station_config.coords.y
 
     station_x_coords = df[coord_x].values
     station_y_coords = df[coord_y].values
-    station_metric = df[station_config["metric"]].values
+    station_metric = df[station_config.metric].values
     return station_metric, station_y_coords, station_x_coords, df
 
 
 def apply_blacklist(blacklist_config, metric_grid, grid_area_y_coords, grid_area_x_coords):
     if blacklist_config is not None:
-        ds = ekd.from_source(*blacklist_config["source"]).to_xarray()
+        ds = ekd.from_source(*blacklist_config.source).to_xarray()
         nc_variable = find_main_var(ds, 2)
         mask = ds[nc_variable].values
         metric_grid[mask] = np.nan
@@ -62,7 +63,7 @@ def outputs_to_df(
     df["opt_x_coord"] = grid_area_x_coords[0, j]
     df["opt_1d_index"] = j + shape[1] * i
     if filename is not None:
-        df.to_csv(filename, index=False)
+        df.to_csv(filename.file, index=False)
     return df
 
 
@@ -78,7 +79,7 @@ def generate_summary_plots(df, plot_config):
     if plot_config is None:
         return
 
-    distance_plot_config = plot_config.get("error", None)
+    distance_plot_config = plot_config.distance
     if distance_plot_config is not None:
         df["grid_offset_i"] = df["opt_i"] - df["near_i"]
         df["grid_offset_j"] = df["opt_j"] - df["near_j"]
@@ -91,26 +92,27 @@ def generate_summary_plots(df, plot_config):
             marginal_y="histogram",
             color_continuous_scale=custom_scale,
         )
-        fig.write_html(distance_plot_config["file"])
+        fig.write_html(distance_plot_config.file)
         fig.show()
 
-    error_plot_config = plot_config.get("error", None)
+    error_plot_config = plot_config.error
     if error_plot_config is not None:
         fig = px.histogram(df, x="opt_error")
-        fig.write_html(error_plot_config["file"])
+        fig.write_html(error_plot_config.file)
         fig.show()
 
 
-def mapper(config):
+def mapper(config_dict):
+    config = Config(**config_dict)
 
-    metric_grid, grid_area_y_coords, grid_area_x_coords = get_grid_inputs(config["grid"])
+    metric_grid, grid_area_y_coords, grid_area_x_coords = get_grid_inputs(config.grid)
 
-    station_metric, station_y_coords, station_x_coords, df = get_station_inputs(config["station"])
+    station_metric, station_y_coords, station_x_coords, df = get_station_inputs(config.station)
 
     metric_grid, grid_area_y_coords, grid_area_x_coords = apply_blacklist(
-        config.get("blacklist", None), metric_grid, grid_area_y_coords, grid_area_x_coords
+        config.blacklist, metric_grid, grid_area_y_coords, grid_area_x_coords
     )
-    mapping_outputs = StationMapping(config["parameters"]).conduct_mapping(
+    mapping_outputs = StationMapping(config.parameters).conduct_mapping(
         station_y_coords, station_x_coords, grid_area_y_coords, grid_area_x_coords, station_metric, metric_grid
     )
     df = outputs_to_df(
@@ -119,9 +121,9 @@ def mapper(config):
         grid_area_y_coords,
         grid_area_x_coords,
         shape=grid_area_y_coords.shape,
-        filename=config["output"]["file"] if config.get("output", None) is not None else None,
+        filename=config.output
     )
 
-    generate_summary_plots(df, config.get("plot", None))
+    generate_summary_plots(df, config.plot)
     
     return df
