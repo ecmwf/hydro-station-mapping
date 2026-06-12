@@ -19,6 +19,8 @@
   <a href="#quick-start">Quick Start</a>
   •
   <a href="#installation">Installation</a>
+  •
+  <a href="https://hydro-station-mapping.readthedocs.io">Documentation</a>
 </p>
 
 > \[!IMPORTANT\]
