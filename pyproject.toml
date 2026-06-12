@@ -70,6 +70,9 @@ dependencies = [
         "ruff",
         "pre-commit"
     ]
+    docs = [
+        "sphinx"
+    ]
 
 [project.scripts]
 hydro-station-mapping = "hydro_station_mapping.cli:mapper_cli"
