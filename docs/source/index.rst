@@ -43,7 +43,7 @@ The configuration options are detailed below in YAML format::
    parameters: # optional
       max_search_distance: 5 # optional, default is 5. Maximum search distance to consider grid cells as mapping candidates (Manhattan distance measured in number of gridcells from the station)
       metric_error_func: mape # optional, default is mape. Error function to compute metric error between station and grid cell
-      distance_error_func: no_error # optional, default is zero (distance not considered). Error function to compute distance error between station and grid cell
+      distance_error_func: no_error # optional, default is zero (distance not considered). Error function to compute distance error between station and grid cell, using the coordinates specified above
       lambd: 0 # optional, default is 0. Weighting factor for distance error relative to metric error. Global error is computed as metric error + lambda * distance error
       max_error: inf # optional, default is np.inf. Maximum combined error (metric error + lambda * distance error) to consider a grid cell as a valid mapping candidate, otherwise the closest grid cell will be selected as the best candidate.
       min_error: 0 # optional, default is 0. If closest grid cell has a combined error (metric error + lambda * distance error) less than min_error, it will be selected as the best candidate without considering other grid cells, even if there are other grid cells with lower combined error.
