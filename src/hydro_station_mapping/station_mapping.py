@@ -14,50 +14,50 @@ class StationMapping:
 
     def conduct_mapping(
         self,
-        station_coords1,
-        station_coords2,
-        grid_area_coords1,
-        grid_area_coords2,
+        station_y_coords, station_x_coords, grid_area_y_coords, grid_area_x_coords,
         station_metric=None,
         grid_metric=None,
     ):
-        num_stations = len(station_coords1)
+        grid_area_coords1 = grid_area_y_coords
+        grid_area_coords2 = grid_area_x_coords
 
-        i = np.empty(num_stations, dtype=int)
-        j = np.empty(num_stations, dtype=int)
-        c_i = np.empty(num_stations, dtype=int)
-        c_j = np.empty(num_stations, dtype=int)
+        num_stations = len(station_y_coords)
+
+        i_arr = np.empty(num_stations, dtype=int)
+        j_arr = np.empty(num_stations, dtype=int)
+        c_i_arr = np.empty(num_stations, dtype=int)
+        c_j_arr = np.empty(num_stations, dtype=int)
         errors = np.empty(num_stations, dtype=float)
-        c_area = np.empty(num_stations, dtype=float)
+        c_areas = np.empty(num_stations, dtype=float)
         best_areas = np.empty(num_stations, dtype=float)
 
         for s in range(num_stations):
-            station_x, station_y = station_coords1[s], station_coords2[s]
+            station_y, station_x = station_y_coords[s], station_x_coords[s]
 
             # get all grid cells within max_search_distance
-            closest_idx = np.nanargmin(np.abs(grid_area_coords1[:, 0] - station_x))
-            closest_idy = np.nanargmin(np.abs(grid_area_coords2[0, :] - station_y))
+            closest_i = np.nanargmin(np.abs(grid_area_coords1[:, 0] - station_y))
+            closest_j = np.nanargmin(np.abs(grid_area_coords2[0, :] - station_x))
 
-            searchbox_min_x = closest_idx - self.max_search_distance
-            searchbox_max_x = closest_idx + self.max_search_distance + 1
-            searchbox_min_y = closest_idy - self.max_search_distance
-            searchbox_max_y = closest_idy + self.max_search_distance + 1
+            searchbox_min_i = closest_i - self.max_search_distance
+            searchbox_max_i = closest_i + self.max_search_distance + 1
+            searchbox_min_j = closest_j - self.max_search_distance
+            searchbox_max_j = closest_j + self.max_search_distance + 1
             # TODO: add option to wrap domain
-            searchbox_min_x = max(0, searchbox_min_x)
-            searchbox_max_x = min(grid_area_coords1.shape[0], searchbox_max_x)
-            searchbox_min_y = max(0, searchbox_min_y)
-            searchbox_max_y = min(grid_area_coords1.shape[1], searchbox_max_y)
+            searchbox_min_i = max(0, searchbox_min_i)
+            searchbox_max_i = min(grid_area_coords1.shape[0], searchbox_max_i)
+            searchbox_min_j = max(0, searchbox_min_j)
+            searchbox_max_j = min(grid_area_coords1.shape[1], searchbox_max_j)
 
-            subset_x = grid_area_coords1[searchbox_min_x:searchbox_max_x, searchbox_min_y:searchbox_max_y]
-            subset_y = grid_area_coords2[searchbox_min_x:searchbox_max_x, searchbox_min_y:searchbox_max_y]
+            subset_y = grid_area_coords1[searchbox_min_i:searchbox_max_i, searchbox_min_j:searchbox_max_j]
+            subset_x = grid_area_coords2[searchbox_min_i:searchbox_max_i, searchbox_min_j:searchbox_max_j]
 
-            shape = subset_x.shape
+            shape = subset_y.shape
 
-            subset_x = subset_x.flatten()
             subset_y = subset_y.flatten()
+            subset_x = subset_x.flatten()
 
-            subset_coords = np.stack((subset_x, subset_y), axis=0)
-            coords_vec = np.array([station_x, station_y])
+            subset_coords = np.stack((subset_y, subset_x), axis=0)
+            coords_vec = np.array([station_y, station_x])
 
             distance_error = self.distance_error_func(coords_vec, subset_coords)
 
@@ -65,7 +65,7 @@ class StationMapping:
                 area_error = 0
             else:
                 assert grid_metric is not None
-                subset_metric = grid_metric[searchbox_min_x:searchbox_max_x, searchbox_min_y:searchbox_max_y].flatten()
+                subset_metric = grid_metric[searchbox_min_i:searchbox_max_i, searchbox_min_j:searchbox_max_j].flatten()
                 area_error = self.metric_error_func(station_metric[s], subset_metric)
 
             error = area_error + self.lambd * distance_error
@@ -77,48 +77,48 @@ class StationMapping:
                 best_error = error[best_error_1d_index]
                 best_area = area[best_error_1d_index]
 
-                center_offset_x = closest_idx - searchbox_min_x
-                center_offset_y = closest_idy - searchbox_min_y
-                subset_width = searchbox_max_y - searchbox_min_y
-                closest_1d_index = center_offset_x * subset_width + center_offset_y
+                center_offset_i = closest_i - searchbox_min_i
+                center_offset_j = closest_j - searchbox_min_j
+                subset_width = searchbox_max_j - searchbox_min_j
+                closest_1d_index = center_offset_i * subset_width + center_offset_j
 
                 closest_error = error[closest_1d_index]
                 closest_area = area[closest_1d_index]
 
                 if closest_error <= self.min_error:  # if nearest cell is good enough
-                    indx = closest_idx
-                    indy = closest_idy
+                    i = closest_i
+                    j = closest_j
                     best_error = closest_error
                     best_area = closest_area
                 elif best_error <= self.max_error:
-                    indx = (min_index[0] + searchbox_min_x) % grid_area_coords1.shape[0]
-                    indy = (min_index[1] + searchbox_min_y) % grid_area_coords1.shape[1]
+                    i = (min_index[0] + searchbox_min_i) % grid_area_coords1.shape[0]
+                    j = (min_index[1] + searchbox_min_j) % grid_area_coords1.shape[1]
                 else:  # if best match is still too bad, revert to closest cell
-                    indx = closest_idx
-                    indy = closest_idy
+                    i = closest_i
+                    j = closest_j
                     best_error = closest_error
                     best_area = closest_area
             except ValueError:
-                center_offset_x = closest_idx - searchbox_min_x
-                center_offset_y = closest_idy - searchbox_min_y
-                subset_width = searchbox_max_y - searchbox_min_y
-                closest_1d_index = center_offset_x * subset_width + center_offset_y
+                center_offset_i = closest_i - searchbox_min_i
+                center_offset_j = closest_j - searchbox_min_j
+                subset_width = searchbox_max_j - searchbox_min_j
+                closest_1d_index = center_offset_i * subset_width + center_offset_j
 
                 closest_error = error[closest_1d_index]
                 closest_area = area[closest_1d_index]
-                indx = closest_idx
-                indy = closest_idy
+                i = closest_i
+                j = closest_j
                 best_error = closest_error
                 best_area = closest_area
 
-            i[s] = indx
-            j[s] = indy
+            i_arr[s] = i
+            j_arr[s] = j
 
-            c_i[s] = closest_idx
-            c_j[s] = closest_idy
+            c_i_arr[s] = closest_i
+            c_j_arr[s] = closest_j
 
             errors[s] = best_error
             best_areas[s] = best_area
-            c_area[s] = closest_area
+            c_areas[s] = closest_area
 
-        return i, j, best_areas, c_i, c_j, c_area, errors
+        return i_arr, j_arr, best_areas, c_i_arr, c_j_arr, c_areas, errors

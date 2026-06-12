@@ -17,9 +17,9 @@ def get_grid_inputs(grid_config):
     coord_x = "lon" if coord_dict is None else coord_dict["x"]
     coord_y = "lat" if coord_dict is None else coord_dict["y"]
 
-    grid_area_coords1, grid_area_coords2 = xr.broadcast(ds[coord_y], ds[coord_x])
-    grid_area_y_coords = grid_area_coords1.values.copy()
-    grid_area_x_coords = grid_area_coords2.values.copy()
+    grid_area_y_coords, grid_area_x_coords = xr.broadcast(ds[coord_y], ds[coord_x])
+    grid_area_y_coords = grid_area_y_coords.values.copy()
+    grid_area_x_coords = grid_area_x_coords.values.copy()
 
     return metric_grid, grid_area_y_coords, grid_area_x_coords
 
