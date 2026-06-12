@@ -3,6 +3,7 @@ import numpy as np
 from hydro_station_mapping import metrics
 from .config import Config
 
+
 class StationMapping:
     def __init__(self, config: Config):
         self.max_search_distance = config.max_search_distance
@@ -14,11 +15,13 @@ class StationMapping:
 
     def conduct_mapping(
         self,
-        station_y_coords, station_x_coords, grid_area_y_coords, grid_area_x_coords,
+        station_y_coords,
+        station_x_coords,
+        grid_area_y_coords,
+        grid_area_x_coords,
         station_metric=None,
         grid_metric=None,
     ):
-
         num_stations = len(station_y_coords)
 
         i_arr = np.empty(num_stations, dtype=int)

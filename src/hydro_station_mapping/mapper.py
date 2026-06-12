@@ -49,9 +49,7 @@ def apply_blacklist(blacklist_config, metric_grid, grid_area_y_coords, grid_area
     return metric_grid, grid_area_y_coords, grid_area_x_coords
 
 
-def outputs_to_df(
-    df, i, j, area, c_i, c_j, c_area, errors, grid_area_y_coords, grid_area_x_coords, shape, filename
-):
+def outputs_to_df(df, i, j, area, c_i, c_j, c_area, errors, grid_area_y_coords, grid_area_x_coords, shape, filename):
     df["opt_i"] = i
     df["opt_j"] = j
     df["near_i"] = c_i
@@ -102,7 +100,7 @@ def generate_summary_plots(df, plot_config):
         fig.show()
 
 
-def mapper(config_dict):
+def mapper(config_dict: dict):
     config = Config(**config_dict)
 
     metric_grid, grid_area_y_coords, grid_area_x_coords = get_grid_inputs(config.grid)
@@ -121,9 +119,9 @@ def mapper(config_dict):
         grid_area_y_coords,
         grid_area_x_coords,
         shape=grid_area_y_coords.shape,
-        filename=config.output
+        filename=config.output,
     )
 
     generate_summary_plots(df, config.plot)
-    
+
     return df
