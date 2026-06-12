@@ -60,6 +60,8 @@ The configuration options are detailed below in YAML format::
       distance:
          file: heatmap.html # path to save interactive distance error plot figure
 
+For an example, see the notebooks folder.
+
 Algorithm
 ---------
 
