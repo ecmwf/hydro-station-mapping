@@ -1,24 +1,27 @@
 import numpy as np
 
 from hydro_station_mapping import metrics
+from .config import Config
 
 
 class StationMapping:
-    def __init__(self, config):
-        self.max_search_distance = config.get("max_search_distance", 5)
-        self.metric_error_func = getattr(metrics, config.get("metric_error_func", "mape"))
-        self.distance_error_func = getattr(metrics, config.get("distance_error_func", "no_error"))
-        self.lambd = config.get("lambda", 0)
-        self.max_error = config.get("max_error", np.inf)
-        self.min_error = config.get("min_error", 0)
+    def __init__(self, config: Config):
+        self.max_search_distance = config.max_search_distance
+        self.metric_error_func = getattr(metrics, config.metric_error_func)
+        self.distance_error_func = getattr(metrics, config.distance_error_func)
+        self.lambd = config.lambd
+        self.max_error = config.max_error
+        self.min_error = config.min_error
 
     def conduct_mapping(
         self,
-        station_y_coords, station_x_coords, grid_area_y_coords, grid_area_x_coords,
+        station_y_coords,
+        station_x_coords,
+        grid_area_y_coords,
+        grid_area_x_coords,
         station_metric=None,
         grid_metric=None,
     ):
-
         num_stations = len(station_y_coords)
 
         i_arr = np.empty(num_stations, dtype=int)
