@@ -52,6 +52,12 @@ Install directly from GitHub via `pip`:
 pip install git+ssh://git@github.com/ecmwf/hydro-station-mapping.git@main
 ```
 
+Or, if you prefer HTTPS:
+
+```bash
+pip install git+https://github.com/ecmwf/hydro-station-mapping.git@main
+```
+
 ## Licence
 
 ```
