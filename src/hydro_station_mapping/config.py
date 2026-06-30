@@ -34,7 +34,7 @@ class BlackListConfig(BaseModel):
 
 
 class MappingParametersConfig(BaseModel):
-    max_search_distance: float = 5
+    max_search_distance: int = 5
     metric_error_func: Literal["zero", "mape", "mspe", "mae", "mse", "rmse"] = "mape"
     distance_error_func: Literal["zero", "mape", "mspe", "mae", "mse", "rmse"] = "zero"
     lambd: float = 0
