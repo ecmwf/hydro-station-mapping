@@ -44,18 +44,8 @@ mapped_df = mapper(config)
 
 ## Installation
 
-> **Note:** This package is not yet published on PyPI. A PyPI release is planned for the future.
-
-Install directly from GitHub via `pip`:
-
 ```bash
 pip install git+ssh://git@github.com/ecmwf/hydro-station-mapping.git@main
-```
-
-Or, if you prefer HTTPS:
-
-```bash
-pip install git+https://github.com/ecmwf/hydro-station-mapping.git@main
 ```
 
 ## Licence
