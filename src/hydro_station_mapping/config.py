@@ -27,6 +27,7 @@ class StationConfig(BaseModel):
 class GridConfig(BaseModel):
     source: List[str]
     coords: CoordsConfig = CoordsConfig()
+    variable: str | None = None
 
 
 class BlackListConfig(BaseModel):
