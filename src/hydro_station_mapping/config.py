@@ -37,7 +37,7 @@ class MappingParametersConfig(BaseModel):
     max_search_distance: int = 5
     metric_error_func: Literal["zero", "mape", "mspe", "mae", "mse", "rmse"] = "mape"
     distance_error_func: Literal["zero", "mape", "mspe", "mae", "mse", "rmse"] = "zero"
-    lambd: float = 0
+    distance_error_weight: float = 0
     max_error: float = np.inf
     min_error: float = 0
 

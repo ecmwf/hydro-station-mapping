@@ -44,9 +44,9 @@ The configuration options are detailed below in YAML format::
       max_search_distance: 5 # optional, default is 5. Maximum search distance to consider grid cells as mapping candidates (Manhattan distance measured in number of gridcells from the station)
       metric_error_func: mape # optional, default is mape. Error function to compute metric error between station and grid cell
       distance_error_func: no_error # optional, default is zero (distance not considered). Error function to compute distance error between station and grid cell, using the coordinates specified above
-      lambd: 0 # optional, default is 0. Weighting factor for distance error relative to metric error. Global error is computed as metric error + lambda * distance error
-      max_error: inf # optional, default is np.inf. Maximum combined error (metric error + lambda * distance error) to consider a grid cell as a valid mapping candidate, otherwise the closest grid cell will be selected as the best candidate.
-      min_error: 0 # optional, default is 0. If closest grid cell has a combined error (metric error + lambda * distance error) less than min_error, it will be selected as the best candidate without considering other grid cells, even if there are other grid cells with lower combined error.
+      distance_error_weight: 0 # optional, default is 0. Weighting factor for distance error relative to metric error. Global error is computed as metric error + distance_error_weight * distance error
+      max_error: inf # optional, default is np.inf. Maximum combined error (metric error + distance_error_weight * distance error) to consider a grid cell as a valid mapping candidate, otherwise the closest grid cell will be selected as the best candidate.
+      min_error: 0 # optional, default is 0. If closest grid cell has a combined error (metric error + distance_error_weight * distance error) less than min_error, it will be selected as the best candidate without considering other grid cells, even if there are other grid cells with lower combined error.
 
    blacklist: # optional, default is no blacklist applied
       source: ["file", blacklist.csv] # earthkit-data from_source configuration to load blacklist boolean mask. Any blacklisted grid cells will be given nan values before mapping.
@@ -67,7 +67,7 @@ Algorithm
 
 The mapping algorithm considers each station in turn and does the following:
 
-1. compute the combined error (metric error + lambda * distance error) between the station and all grid cells within the max_search_distance box
+1. compute the combined error (metric error + distance_error_weight * distance error) between the station and all grid cells within the max_search_distance box
 2. if the closest gridcell (in terms of distance) has a combined error less than min_error, select it as the best candidate and skip searching other grid cells
 3. if no considered gridcells have a combined error less than max_error, select the closest grid cell as the best candidate (even if blacklisted)
 4. otherwise, select the grid cell with the lowest combined error as the best candidate
