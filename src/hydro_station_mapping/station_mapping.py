@@ -17,7 +17,7 @@ class StationMapping:
         self.max_search_distance = config.max_search_distance
         self.metric_error_func = getattr(metrics, config.metric_error_func)
         self.distance_error_func = getattr(metrics, config.distance_error_func)
-        self.lambd = config.lambd
+        self.distance_error_weight = config.distance_error_weight
         self.max_error = config.max_error
         self.min_error = config.min_error
 
@@ -79,7 +79,7 @@ class StationMapping:
                 subset_metric = grid_metric[searchbox_min_i:searchbox_max_i, searchbox_min_j:searchbox_max_j].flatten()
                 area_error = self.metric_error_func(station_metric[s], subset_metric)
 
-            error = area_error + self.lambd * distance_error
+            error = area_error + self.distance_error_weight * distance_error
             area = subset_metric
 
             try:
