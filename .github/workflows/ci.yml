@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+
 jobs:
   qa-pre-commit:
     uses: ecmwf/reusable-workflows/.github/workflows/qa-precommit-run.yml@v2
