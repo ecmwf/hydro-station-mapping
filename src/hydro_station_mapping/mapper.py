@@ -19,7 +19,11 @@ from .station_mapping import StationMapping
 
 def get_grid_inputs(grid_config):
     ds = ekd.from_source(*grid_config.source).to_xarray()
-    nc_variable = find_main_var(ds, 2)
+    nc_variable = grid_config.variable if grid_config.variable is not None else find_main_var(ds, 2)
+    if nc_variable not in ds.data_vars:
+        raise ValueError(
+            f"Variable '{nc_variable}' not found in dataset. Available data variables: {list(ds.data_vars)}."
+        )
     metric_grid = ds[nc_variable].values
 
     coord_dict = grid_config.coords

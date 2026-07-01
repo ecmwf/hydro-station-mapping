@@ -26,7 +26,13 @@ def upstream_area_file(tmp_path):
     return upstream_area_path
 
 
-def build_config(stations_file, upstream_area_file, max_search_distance):
+def build_config(stations_file, upstream_area_file, max_search_distance, variable=None):
+    grid = {
+        "source": ["file", str(upstream_area_file)],
+        "coords": {"x": "lon", "y": "lat"},
+    }
+    if variable is not None:
+        grid["variable"] = variable
     return {
         "station": {
             "file": str(stations_file),
@@ -34,10 +40,7 @@ def build_config(stations_file, upstream_area_file, max_search_distance):
             "coords": {"x": "StationLon", "y": "StationLat"},
             "metric": "drainage_area_provided",
         },
-        "grid": {
-            "source": ["file", str(upstream_area_file)],
-            "coords": {"x": "lon", "y": "lat"},
-        },
+        "grid": grid,
         "parameters": {
             "max_search_distance": max_search_distance,
             "metric_error_func": "mape",
@@ -87,13 +90,14 @@ expected_msd1 = pd.DataFrame(
 
 
 @pytest.mark.parametrize(
-    "max_search_distance,expected",
+    "max_search_distance,variable,expected",
     [
-        (5, expected_msd5),
-        (1, expected_msd1),
+        (5, None, expected_msd5),
+        (1, None, expected_msd1),
+        (5, "upstream_area", expected_msd5),
     ],
 )
-def test_mapping(stations_file, upstream_area_file, max_search_distance, expected):
-    config = build_config(stations_file, upstream_area_file, max_search_distance)
+def test_mapping(stations_file, upstream_area_file, max_search_distance, variable, expected):
+    config = build_config(stations_file, upstream_area_file, max_search_distance, variable)
     df = mapper(config)
     pd.testing.assert_frame_equal(df, expected)
