@@ -41,8 +41,8 @@ dependencies = [
     "tqdm",
     "ipyleaflet",
     "ipywidgets",
-    "earthkit-data>=0.18.2",
-    "earthkit-hydro>=1.2.0",
+    "earthkit-data~=1.0",
+    "earthkit-hydro~=1.3",
     "earthkit-meteo",
     "cfgrib", # check if necessary
     "netCDF4", # check if necessary
