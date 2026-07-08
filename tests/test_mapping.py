@@ -1,3 +1,6 @@
+# (C) Copyright 2026- ECMWF and individual contributors.
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 import pandas as pd
