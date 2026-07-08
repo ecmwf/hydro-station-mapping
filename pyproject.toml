@@ -34,24 +34,10 @@ dependencies = [
     "numpy",
     "pandas",
     "xarray",
-    "matplotlib",
-    "geopandas",
-    "typer", # check if necessary
-    "humanize", # check if necessary
-    "tqdm",
-    "ipyleaflet",
-    "ipywidgets",
     "earthkit-data~=1.0",
     "earthkit-hydro~=1.3",
-    "earthkit-meteo",
-    "cfgrib", # check if necessary
-    "netCDF4", # check if necessary
-    "eccodes", # check if necessary
     "plotly",
-    "floods-html",
-    "geopy",
-    "setuptools",
-    "anywidget"
+    "pydantic"
 ]
 
 [project.urls]
