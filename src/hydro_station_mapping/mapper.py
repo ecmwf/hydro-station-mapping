@@ -1,4 +1,4 @@
-# (C) Copyright 2026- ECMWF and individual contributors.
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
 # SPDX-License-Identifier: Apache-2.0
 
 import pandas as pd
